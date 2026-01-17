@@ -1,7 +1,7 @@
 import React from "react";
-import { MessageSquare, Image, Menu, X, Sun, Moon, User } from "lucide-react";
+import { MessageSquare, Image, Menu, X, Sun, Moon, User, PlusCircle } from "lucide-react";
 
-const Sidebar = ({ isOpen, toggleSidebar, mode, setMode, theme, toggleTheme }) => {
+const Sidebar = ({ isOpen, toggleSidebar, mode, setMode, theme, toggleTheme, onNewChat }) => {
     const menuItems = [
         { id: "chat", icon: <MessageSquare size={18} />, label: "Conversation" },
         { id: "image", icon: <Image size={18} />, label: "Génération Studio" },
@@ -24,7 +24,7 @@ const Sidebar = ({ isOpen, toggleSidebar, mode, setMode, theme, toggleTheme }) =
             >
                 <div className="flex flex-col h-full p-6">
                     {/* Header Branding */}
-                    <div className="flex items-center gap-3 mb-12 px-2 mt-2">
+                    <div className="flex items-center gap-3 mb-8 px-2 mt-2">
                         <div className="relative group">
                             <div className="absolute -inset-1 bg-gradient-to-tr from-[var(--accent-blue)] to-blue-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
                             <img
@@ -43,6 +43,18 @@ const Sidebar = ({ isOpen, toggleSidebar, mode, setMode, theme, toggleTheme }) =
                             <X size={20} />
                         </button>
                     </div>
+
+                    {/* New Chat Button */}
+                    <button
+                        onClick={() => {
+                            onNewChat();
+                            if (window.innerWidth < 1024) toggleSidebar();
+                        }}
+                        className="flex items-center gap-3 w-full px-5 py-3.5 mb-8 rounded-2xl border-2 border-[var(--accent-blue)]/30 text-[var(--accent-blue)] font-bold hover:bg-[var(--accent-soft)] transition-all duration-300 group shadow-lg shadow-[#00E5FF]/5"
+                    >
+                        <PlusCircle size={20} className="group-hover:rotate-90 transition-transform duration-500" />
+                        <span className="text-sm">Nouvelle Discussion</span>
+                    </button>
 
                     {/* Navigation */}
                     <nav className="flex-1 space-y-2">

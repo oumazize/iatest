@@ -5,8 +5,17 @@ import InputArea from "./components/InputArea";
 import { chatWithGroq, generateImageURL } from "./services/api";
 import { Menu, AlertCircle } from "lucide-react";
 
+const SYSTEM_PROMPT = {
+  role: "system",
+  content: "Tu es Cortex IA, un assistant virtuel expert en technologie et design. Tu es ultra-rapide, précis et professionnel. Tu utilises un ton moderne et encourageant."
+};
+
 function App() {
-  const [messages, setMessages] = useState([]);
+  // Initialisation à partir de localStorage
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem("cortex_messages");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [mode, setMode] = useState("chat"); // 'chat' ou 'image'
   const [isLoading, setIsLoading] = useState(false);
@@ -23,8 +32,18 @@ function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  // Sauvegarde des messages dans localStorage
+  useEffect(() => {
+    localStorage.setItem("cortex_messages", JSON.stringify(messages));
+  }, [messages]);
+
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
+  };
+
+  const handleNewChat = () => {
+    setMessages([]);
+    localStorage.removeItem("cortex_messages");
   };
 
   const scrollToBottom = () => {
@@ -38,16 +57,17 @@ function App() {
   const handleSendMessage = async (content) => {
     setError(null);
     const userMessage = { role: "user", content, type: "text" };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setIsLoading(true);
 
     if (mode === "chat") {
       try {
-        // Message temporaire pour le streaming
         const aiMessageId = Date.now();
         setMessages((prev) => [...prev, { role: "assistant", content: "", id: aiMessageId, type: "text" }]);
 
-        await chatWithGroq([...messages, userMessage], (fullContent) => {
+        // Ajout du System Prompt au début de la requête
+        await chatWithGroq([SYSTEM_PROMPT, ...newMessages], (fullContent) => {
           setMessages((prev) =>
             prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: fullContent } : msg))
           );
@@ -57,7 +77,6 @@ function App() {
         console.error(err);
       }
     } else {
-      // Mode Image
       try {
         const imageURL = generateImageURL(content);
         setMessages((prev) => [...prev, { role: "assistant", content: imageURL, type: "image" }]);
@@ -78,26 +97,27 @@ function App() {
         setMode={setMode}
         theme={theme}
         toggleTheme={toggleTheme}
+        onNewChat={handleNewChat}
       />
 
-      <main className="flex-1 flex flex-col relative w-full lg:ml-72 transition-all duration-300 font-sans">
-        {/* Header Mobile */}
-        <header className="flex items-center justify-between p-4 border-b border-[var(--border-color)] lg:hidden">
-          <button onClick={() => setIsSidebarOpen(true)} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg">
+      <main className="flex-1 flex flex-col relative w-full lg:ml-72 transition-all duration-300 font-sans h-full">
+        {/* Header Mobile - FIXÉ */}
+        <header className="fixed top-0 left-0 right-0 lg:left-72 z-30 flex items-center justify-between p-4 border-b border-[var(--border-color)] bg-[var(--bg-app)]/80 backdrop-blur-md">
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg lg:hidden">
             <Menu size={24} />
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mx-auto lg:mx-0">
             <img src="/logo.jpg" alt="Logo" className="w-8 h-8 rounded-full object-cover" />
             <h2 className="text-lg font-bold font-montserrat tracking-tight">Cortex IA</h2>
           </div>
-          <div className="w-10" />
+          <div className="w-10 lg:hidden" />
         </header>
 
-        {/* Zone des messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-8 md:px-12 custom-scrollbar">
-          <div className="max-w-4xl mx-auto space-y-12">
+        {/* Zone des messages - Padding TOP pour compenser le header fixé */}
+        <div className="flex-1 overflow-y-auto px-4 pt-24 pb-4 md:px-12 custom-scrollbar">
+          <div className="max-w-4xl mx-auto space-y-12 pb-32">
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+              <div className="flex flex-col items-center justify-center h-[50vh] text-center px-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                 <h3 className="text-4xl md:text-6xl font-black mb-6 tracking-tight font-montserrat">
                   Bienvenue dans <span className="bg-gradient-to-r from-[#00E5FF] to-blue-500 bg-clip-text text-transparent">Cortex IA</span>
                 </h3>
@@ -111,23 +131,30 @@ function App() {
             {messages.map((msg, index) => (
               <ChatMessage key={index} message={msg} />
             ))}
+            {isLoading && messages[messages.length - 1]?.role === "user" && (
+              <div className="flex justify-start">
+                <div className="bg-[var(--chat-ai-bg)] p-4 rounded-2xl animate-pulse">
+                  Génération en cours...
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
         </div>
 
         {/* Alerte d'erreur */}
         {error && (
-          <div className="absolute top-20 left-1/2 -translate-x-1/2 bg-red-900/40 border border-red-500/50 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 text-red-200 text-sm animate-bounce shadow-lg">
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-40 bg-red-900/60 border border-red-500/50 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 text-red-100 text-sm animate-bounce shadow-lg">
             <AlertCircle size={16} />
             {error}
             <button onClick={() => setError(null)} className="ml-2 hover:text-white">✕</button>
           </div>
         )}
 
-        {/* Barre de saisie */}
-        <footer className="p-4 md:p-8 bg-gradient-to-t from-[var(--bg-app)] via-[var(--bg-app)] to-transparent">
+        {/* Barre de saisie - FIXÉ EN BAS */}
+        <footer className="absolute bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-[var(--bg-app)] via-[var(--bg-app)] to-transparent z-20">
           <InputArea onSendMessage={handleSendMessage} mode={mode} />
-          <p className="text-center text-[11px] text-[var(--text-secondary)] mt-6 uppercase tracking-[0.25em] font-bold opacity-30">
+          <p className="text-center text-[10px] text-[var(--text-secondary)] mt-4 uppercase tracking-[0.25em] font-bold opacity-30">
             © 2026 Cortex IA. Tous droits réservés.
           </p>
         </footer>

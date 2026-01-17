@@ -39,7 +39,8 @@ const InputArea = ({ onSendMessage, mode }) => {
                     onKeyDown={handleKeyDown}
                     placeholder={mode === "chat" ? "Qu'est-ce qui vous préoccupe aujourd'hui ?" : "Décrivez une scène spectaculaire..."}
                     rows={1}
-                    className="w-full bg-transparent border-none focus:ring-0 text-[var(--text-main)] placeholder-slate-400 dark:placeholder-slate-500 resize-none py-3 text-base font-medium scrollbar-hide"
+                    style={{ outline: 'none', boxShadow: 'none' }}
+                    className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-[var(--text-main)] placeholder-slate-400 dark:placeholder-slate-500 resize-none py-3 text-base font-medium scrollbar-hide"
                 />
             </div>
             <button
