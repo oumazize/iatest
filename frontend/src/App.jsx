@@ -7,7 +7,7 @@ import { Menu, AlertCircle } from "lucide-react";
 
 const SYSTEM_PROMPT = {
   role: "system",
-  content: "Tu es Cortex IA, un assistant virtuel expert en technologie et design. Tu es ultra-rapide, précis et professionnel. Tu utilises un ton moderne et encourageant."
+  content: "Tu es Cortex IA, un assistant virtuel expert en technologie et Education. Tu es ultra-rapide, précis et professionnel. Tu utilises un ton moderne et encourageant."
 };
 
 function App() {
