@@ -9,24 +9,24 @@ const ChatMessage = ({ message }) => {
     const isAI = message.role === "assistant";
 
     return (
-        <div className={`flex w-full mb-6 ${isAI ? "justify-start" : "justify-end"}`}>
-            <div className={`flex max-w-[85%] md:max-w-[75%] ${isAI ? "flex-row" : "flex-row-reverse"}`}>
+        <div className={`flex w-full mb-10 ${isAI ? "justify-start" : "justify-end"}`}>
+            <div className={`flex max-w-[90%] md:max-w-[80%] ${isAI ? "flex-row" : "flex-row-reverse"} gap-4`}>
                 <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1 ${isAI ? "bg-gray-700 mr-3" : "bg-blue-600 ml-3"
+                    className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-md ${isAI ? "bg-gray-200 dark:bg-gray-700" : "bg-blue-500 shadow-blue-500/20"
                         }`}
                 >
-                    {isAI ? <Bot size={18} className="text-white" /> : <User size={18} className="text-white" />}
+                    {isAI ? <Bot size={20} className={isAI ? "text-blue-500" : "text-white"} /> : <User size={20} className="text-white" />}
                 </div>
 
                 <div
-                    className={`p-4 rounded-2xl shadow-sm ${isAI ? "bg-gray-800 text-gray-100" : "bg-blue-700 text-white"
+                    className={`p-6 rounded-3xl shadow-sm ${isAI ? "bg-[var(--chat-ai-bg)]" : "bg-blue-500 text-white"
                         }`}
                 >
                     {message.type === "image" ? (
                         <img
                             src={message.content}
                             alt="Generated AI"
-                            className="rounded-lg max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
+                            className="rounded-2xl max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity border-4 border-white/10"
                             onClick={() => window.open(message.content, "_blank")}
                         />
                     ) : (

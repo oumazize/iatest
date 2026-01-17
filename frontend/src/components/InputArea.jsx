@@ -29,9 +29,9 @@ const InputArea = ({ onSendMessage, mode }) => {
     return (
         <form
             onSubmit={handleSubmit}
-            className="max-w-4xl mx-auto p-4 bg-gray-900/50 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl flex items-end gap-2"
+            className="max-w-4xl mx-auto p-4 bg-[var(--bg-sidebar)] border border-[var(--border-color)] rounded-3xl shadow-2xl flex items-end gap-3 transition-all duration-300"
         >
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 px-2">
                 <textarea
                     ref={textareaRef}
                     value={input}
@@ -39,18 +39,18 @@ const InputArea = ({ onSendMessage, mode }) => {
                     onKeyDown={handleKeyDown}
                     placeholder={mode === "chat" ? "Posez n'importe quelle question..." : "Décrivez l'image à générer..."}
                     rows={1}
-                    className="w-full bg-transparent border-none focus:ring-0 text-gray-100 placeholder-gray-500 resize-none py-3 text-lg scrollbar-hide"
+                    className="w-full bg-transparent border-none focus:ring-0 text-[var(--text-main)] placeholder-gray-500 resize-none py-4 text-base scrollbar-hide"
                 />
             </div>
             <button
                 type="submit"
                 disabled={!input.trim()}
-                className={`p-3 rounded-xl transition-all ${input.trim()
-                        ? "bg-blue-600 hover:bg-blue-500 text-white"
-                        : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                className={`p-4 rounded-2xl transition-all duration-200 ${input.trim()
+                        ? "bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95"
+                        : "bg-gray-200 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
                     }`}
             >
-                {mode === "chat" ? <Send size={20} /> : <ImageIcon size={20} />}
+                {mode === "chat" ? <Send size={22} /> : <ImageIcon size={22} />}
             </button>
         </form>
     );
