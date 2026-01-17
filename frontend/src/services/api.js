@@ -24,8 +24,11 @@ export const chatWithGroq = async (messages, onStream) => {
     });
 
     try {
+        // Nettoyage des messages pour ne garder que 'role' et 'content' (exigé par l'API Groq)
+        const cleanedMessages = messages.map(({ role, content }) => ({ role, content }));
+
         const stream = await groq.chat.completions.create({
-            messages,
+            messages: cleanedMessages,
             model: "llama-3.3-70b-versatile",
             stream: true,
         });
