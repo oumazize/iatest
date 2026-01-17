@@ -13,7 +13,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("⚡ Assane AI Ultimate")
-st.caption("Propulsé par Groq (Texte) & Pollinations (Image)")
+st.caption("Propulsé par Groq (Llama 3.3) & Pollinations (Image)")
 
 # --- 1. GESTION DE LA CLÉ GROQ ---
 # On récupère la clé depuis les secrets de Streamlit
@@ -28,13 +28,11 @@ client = Groq(api_key=groq_api_key)
 # --- 2. MENU LATÉRAL ---
 mode = st.sidebar.radio("Mode", ["💬 Chat", "🎨 Générateur d'Images"])
 
-# ... (début du code inchangé) ...
-
 # --- 3. MODE CHAT (Groq) ---
 if mode == "💬 Chat":
     # Initialiser l'historique si vide
     if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "system", "content": "Tu es une IA utile et cool."}]
+        st.session_state.messages = [{"role": "system", "content": "Tu es une IA utile, précise et cool."}]
 
     # Afficher les anciens messages
     for msg in st.session_state.messages:
@@ -51,19 +49,22 @@ if mode == "💬 Chat":
         # Réponse IA
         with st.chat_message("assistant"):
             try:
+                # Création du flux de réponse avec le bon modèle
                 stream = client.chat.completions.create(
-                    model="llama-3.3-70b-versatile", # <--- C'EST ICI LA CORRECTION
+                    model="llama-3.3-70b-versatile", 
                     messages=st.session_state.messages,
                     stream=True,
                 )
+                
+                # ÉCRITURE AUTOMATIQUE ET PROPRE (Gère le JSON tout seul)
                 response = st.write_stream(stream)
-                # Sauvegarder la réponse seulement si ça a marché
+                
+                # Sauvegarder la réponse dans l'historique
                 st.session_state.messages.append({"role": "assistant", "content": response})
             
             except Exception as e:
                 st.error(f"Erreur Groq : {e}")
 
-# ... (reste du code inchangé) ...
 # --- 4. MODE IMAGE (Pollinations - Gratuit sans clé) ---
 elif mode == "🎨 Générateur d'Images":
     st.subheader("Studio de Création")
