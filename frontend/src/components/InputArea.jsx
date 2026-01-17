@@ -38,15 +38,14 @@ const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, isAISpeak
 
     // Gérer l'état du micro selon isVoiceMode et isAISpeaking (Anti-feedback)
     useEffect(() => {
-        if (isVoiceMode) {
-            if (isAISpeaking) {
-                // L'IA parle : on arrête d'écouter mais on garde isVoiceMode actif
-                SpeechRecognition.stopListening();
-            } else {
-                // L'IA se tait : on reprend l'écoute
-                SpeechRecognition.startListening({ continuous: true, language: 'fr-FR' });
-            }
+        if (isVoiceMode && !isAISpeaking) {
+            console.log("Démarrage de l'écoute...");
+            SpeechRecognition.startListening({
+                continuous: true,
+                language: 'fr-FR'
+            });
         } else {
+            console.log("Arrêt de l'écoute...");
             SpeechRecognition.stopListening();
         }
 
@@ -100,8 +99,8 @@ const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, isAISpeak
                     type="button"
                     onClick={toggleVoice}
                     className={`p-3.5 rounded-[20px] transition-all duration-300 ${isVoiceMode
-                            ? "bg-[var(--accent-blue)] text-slate-900 shadow-lg shadow-[#00E5FF]/40"
-                            : "bg-slate-100 dark:bg-slate-800 text-[var(--text-secondary)] hover:bg-slate-200 dark:hover:bg-slate-800"
+                        ? "bg-[var(--accent-blue)] text-slate-900 shadow-lg shadow-[#00E5FF]/40"
+                        : "bg-slate-100 dark:bg-slate-800 text-[var(--text-secondary)] hover:bg-slate-200 dark:hover:bg-slate-800"
                         }`}
                     title={isVoiceMode ? "Désactiver le mode vocal" : "Activer le mode vocal"}
                 >
@@ -125,8 +124,8 @@ const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, isAISpeak
                     type="submit"
                     disabled={!input.trim() && !transcript.trim()}
                     className={`p-3.5 rounded-[20px] transition-all duration-300 ${(input.trim() || transcript.trim())
-                            ? "bg-[var(--accent-blue)] text-slate-900 shadow-lg shadow-[#00E5FF]/30 hover:scale-105 active:scale-95"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed items-center justify-center flex"
+                        ? "bg-[var(--accent-blue)] text-slate-900 shadow-lg shadow-[#00E5FF]/30 hover:scale-105 active:scale-95"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed items-center justify-center flex"
                         }`}
                 >
                     <Send size={20} className={(input.trim() || transcript.trim()) ? "animate-in zoom-in duration-300" : ""} />
