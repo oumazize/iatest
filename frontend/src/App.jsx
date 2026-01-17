@@ -78,22 +78,27 @@ function App() {
   const speakText = (text) => {
     if (!isVoiceMode || !window.speechSynthesis) return;
 
-    stopSpeaking();
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Arrêter toute lecture en cours
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume(); // Débloquer sur certains navigateurs
+
+    // Nettoyage rapide du texte (enlever markdown pour la lecture)
+    const cleanedText = text.replace(/[\*#_`]/g, '').trim();
+    if (!cleanedText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
     utterance.lang = "fr-FR";
-
-    // Voix naturelle
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v => v.lang.startsWith("fr") && (v.name.includes("Online") || v.name.includes("Natural")));
-    if (preferredVoice) utterance.voice = preferredVoice;
-
     utterance.rate = 1.1;
 
+    // Sélection de la voix
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.lang.startsWith("fr") && (v.name.includes("Online") || v.name.includes("Natural")))
+      || voices.find(v => v.lang.startsWith("fr"));
+
+    if (preferredVoice) utterance.voice = preferredVoice;
+
     utterance.onstart = () => setIsAISpeaking(true);
-    utterance.onend = () => {
-      setIsAISpeaking(false);
-      // On ne relance pas le micro ici, InputArea s'en occupe
-    };
+    utterance.onend = () => setIsAISpeaking(false);
     utterance.onerror = () => setIsAISpeaking(false);
 
     window.speechSynthesis.speak(utterance);
