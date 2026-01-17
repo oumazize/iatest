@@ -28,6 +28,8 @@ client = Groq(api_key=groq_api_key)
 # --- 2. MENU LATÉRAL ---
 mode = st.sidebar.radio("Mode", ["💬 Chat", "🎨 Générateur d'Images"])
 
+# ... (début du code inchangé) ...
+
 # --- 3. MODE CHAT (Groq) ---
 if mode == "💬 Chat":
     # Initialiser l'historique si vide
@@ -48,16 +50,20 @@ if mode == "💬 Chat":
 
         # Réponse IA
         with st.chat_message("assistant"):
-            stream = client.chat.completions.create(
-                model="llama3-70b-8192",
-                messages=st.session_state.messages,
-                stream=True,
-            )
-            response = st.write_stream(stream)
-        
-        # Sauvegarder la réponse
-        st.session_state.messages.append({"role": "assistant", "content": response})
+            try:
+                stream = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile", # <--- C'EST ICI LA CORRECTION
+                    messages=st.session_state.messages,
+                    stream=True,
+                )
+                response = st.write_stream(stream)
+                # Sauvegarder la réponse seulement si ça a marché
+                st.session_state.messages.append({"role": "assistant", "content": response})
+            
+            except Exception as e:
+                st.error(f"Erreur Groq : {e}")
 
+# ... (reste du code inchangé) ...
 # --- 4. MODE IMAGE (Pollinations - Gratuit sans clé) ---
 elif mode == "🎨 Générateur d'Images":
     st.subheader("Studio de Création")
