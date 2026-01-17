@@ -80,7 +80,7 @@ function App() {
         toggleTheme={toggleTheme}
       />
 
-      <main className="flex-1 flex flex-col relative w-full lg:ml-72 transition-all duration-300">
+      <main className="flex-1 flex flex-col relative w-full lg:ml-72 transition-all duration-300 font-sans">
         {/* Header Mobile */}
         <header className="flex items-center justify-between p-4 border-b border-[var(--border-color)] lg:hidden">
           <button onClick={() => setIsSidebarOpen(true)} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg">
@@ -88,24 +88,20 @@ function App() {
           </button>
           <div className="flex items-center gap-2">
             <img src="/logo.jpg" alt="Logo" className="w-8 h-8 rounded-full object-cover" />
-            <h2 className="text-lg font-bold">Cortex IA</h2>
+            <h2 className="text-lg font-bold font-montserrat tracking-tight">Cortex IA</h2>
           </div>
           <div className="w-10" />
         </header>
 
         {/* Zone des messages */}
         <div className="flex-1 overflow-y-auto px-4 py-8 md:px-12 custom-scrollbar">
-          <div className="max-w-4xl mx-auto space-y-10">
+          <div className="max-w-4xl mx-auto space-y-12">
             {messages.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-in fade-in duration-700">
-                <div className="relative mb-8 group">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-primary-blue via-primary-yellow to-primary-pink rounded-full blur-xl opacity-40 group-hover:opacity-60 transition duration-1000"></div>
-                  <img src="/logo.jpg" alt="Logo" className="relative w-24 h-24 rounded-3xl object-cover shadow-2xl border-4 border-white dark:border-gray-800" />
-                </div>
-                <h3 className="text-3xl md:text-4xl font-black mb-4 tracking-tight">
-                  Bienvenue dans <span className="bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent">Cortex IA</span>
+              <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                <h3 className="text-4xl md:text-6xl font-black mb-6 tracking-tight font-montserrat">
+                  Bienvenue dans <span className="bg-gradient-to-r from-[#00E5FF] to-blue-500 bg-clip-text text-transparent">Cortex IA</span>
                 </h3>
-                <p className="text-gray-500 max-w-md text-lg font-medium leading-relaxed">
+                <p className="text-[var(--text-secondary)] max-w-lg text-lg md:text-xl font-medium leading-relaxed">
                   {mode === "chat"
                     ? "L'intelligence artificielle ultra-rapide au service de votre créativité et de votre productivité."
                     : "Transformez vos idées en images spectaculaires grâce à la puissance des réseaux neuronaux."}
@@ -129,10 +125,10 @@ function App() {
         )}
 
         {/* Barre de saisie */}
-        <footer className="p-4 md:p-12 bg-gradient-to-t from-[var(--bg-app)] via-[var(--bg-app)] to-transparent">
+        <footer className="p-4 md:p-8 bg-gradient-to-t from-[var(--bg-app)] via-[var(--bg-app)] to-transparent">
           <InputArea onSendMessage={handleSendMessage} mode={mode} />
-          <p className="text-center text-[10px] text-gray-500 mt-6 uppercase tracking-widest font-medium opacity-60">
-            Propulsé par Groq & Pollinations.ai • Design par Expert Frontend
+          <p className="text-center text-[11px] text-[var(--text-secondary)] mt-6 uppercase tracking-[0.25em] font-bold opacity-30">
+            © 2026 Cortex IA. Tous droits réservés.
           </p>
         </footer>
       </main>

@@ -1,31 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-blue: #e0f2fe;
-  /* Light Blue */
-  --color-primary-yellow: #fef9c3;
-  /* Light Yellow */
-  --color-primary-pink: #fce7f3;
-  /* Light Pink */
+  --color-accent-cortex: #00E5FF;
 }
 
 :root {
   --bg-app: #ffffff;
-  --bg-sidebar: #f8fafc;
+  --bg-sidebar: #F8F9FA;
   --text-main: #1e293b;
+  --text-secondary: #64748b;
   --border-color: #e2e8f0;
-  --chat-ai-bg: #f1f5f9;
-  --chat-user-bg: #e0f2fe;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  --chat-ai-bg: #f8fafc;
+  --chat-user-bg: #f0f9ff;
+  --accent-blue: #00E5FF;
+  --accent-soft: rgba(0, 229, 255, 0.1);
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dark {
   --bg-app: #0f172a;
-  --bg-sidebar: #020617;
-  --text-main: #f8fafc;
+  --bg-sidebar: #0A192F;
+  --text-main: #f1f5f9;
+  --text-secondary: #94a3b8;
   --border-color: #1e293b;
   --chat-ai-bg: #1e293b;
-  --chat-user-bg: #0369a1;
+  --chat-user-bg: #1e3a8a;
 }
 
 body {
@@ -33,6 +32,14 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-app);
   color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
