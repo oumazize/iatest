@@ -30,32 +30,34 @@ const ChatMessage = ({ message }) => {
                             onClick={() => window.open(message.content, "_blank")}
                         />
                     ) : (
-                        <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            className="prose prose-invert max-w-none break-words"
-                            components={{
-                                code({ node, inline, className, children, ...props }) {
-                                    const match = /language-(\w+)/.exec(className || "");
-                                    return !inline && match ? (
-                                        <SyntaxHighlighter
-                                            style={vscDarkPlus}
-                                            language={match[1]}
-                                            PreTag="div"
-                                            className="rounded-md my-2"
-                                            {...props}
-                                        >
-                                            {String(children).replace(/\n$/, "")}
-                                        </SyntaxHighlighter>
-                                    ) : (
-                                        <code className="bg-black/30 rounded px-1" {...props}>
-                                            {children}
-                                        </code>
-                                    );
-                                },
-                            }}
-                        >
-                            {message.content}
-                        </ReactMarkdown>
+                        <div className="prose prose-invert max-w-none break-words">
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                    code(props) {
+                                        const { children, className, node, ...rest } = props;
+                                        const match = /language-(\w+)/.exec(className || "");
+                                        return match ? (
+                                            <SyntaxHighlighter
+                                                {...rest}
+                                                style={vscDarkPlus}
+                                                language={match[1]}
+                                                PreTag="div"
+                                                className="rounded-md my-2"
+                                            >
+                                                {String(children).replace(/\n$/, "")}
+                                            </SyntaxHighlighter>
+                                        ) : (
+                                            <code className="bg-black/30 rounded px-1" {...rest}>
+                                                {children}
+                                            </code>
+                                        );
+                                    },
+                                }}
+                            >
+                                {message.content}
+                            </ReactMarkdown>
+                        </div>
                     )}
                 </div>
             </div>
