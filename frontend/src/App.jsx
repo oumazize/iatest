@@ -21,7 +21,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
+  const [isVoiceMode, setIsVoiceMode] = useState(false);
   const messagesEndRef = useRef(null);
+  const speechRef = useRef(null);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -44,6 +46,7 @@ function App() {
   const handleNewChat = () => {
     setMessages([]);
     localStorage.removeItem("cortex_messages");
+    stopSpeaking();
   };
 
   const scrollToBottom = () => {
@@ -54,8 +57,32 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
+  const stopSpeaking = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  };
+
+  const speakText = (text) => {
+    if (!isVoiceMode || !window.speechSynthesis) return;
+
+    stopSpeaking();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "fr-FR";
+
+    // Essayer de trouver une voix naturelle
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.lang.startsWith("fr") && (v.name.includes("Online") || v.name.includes("Natural")));
+    if (preferredVoice) utterance.voice = preferredVoice;
+
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  };
+
   const handleSendMessage = async (content) => {
     setError(null);
+    stopSpeaking(); // Interrompre si l'utilisateur envoie un message
     const userMessage = { role: "user", content, type: "text" };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
@@ -66,12 +93,18 @@ function App() {
         const aiMessageId = Date.now();
         setMessages((prev) => [...prev, { role: "assistant", content: "", id: aiMessageId, type: "text" }]);
 
-        // Ajout du System Prompt au début de la requête
-        await chatWithGroq([SYSTEM_PROMPT, ...newMessages], (fullContent) => {
+        let fullResponse = "";
+        await chatWithGroq([SYSTEM_PROMPT, ...newMessages], (chunk) => {
+          fullResponse = chunk;
           setMessages((prev) =>
-            prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: fullContent } : msg))
+            prev.map((msg) => (msg.id === aiMessageId ? { ...msg, content: chunk } : msg))
           );
         });
+
+        // Lire la réponse une fois terminée
+        if (isVoiceMode) {
+          speakText(fullResponse);
+        }
       } catch (err) {
         setError("Désolé, une erreur est survenue lors de la connexion à Groq.");
         console.error(err);
@@ -153,7 +186,13 @@ function App() {
 
         {/* Barre de saisie - FIXÉ EN BAS */}
         <footer className="absolute bottom-0 left-0 right-0 p-4 md:p-8 bg-gradient-to-t from-[var(--bg-app)] via-[var(--bg-app)] to-transparent z-20">
-          <InputArea onSendMessage={handleSendMessage} mode={mode} />
+          <InputArea
+            onSendMessage={handleSendMessage}
+            mode={mode}
+            isVoiceMode={isVoiceMode}
+            setIsVoiceMode={setIsVoiceMode}
+            onUserSpeaking={() => stopSpeaking()} // Interrompre l'IA quand l'utilisateur parle
+          />
           <p className="text-center text-[10px] text-[var(--text-secondary)] mt-4 uppercase tracking-[0.25em] font-bold opacity-30">
             © 2026 Cortex IA. Tous droits réservés.
           </p>
