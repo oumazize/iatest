@@ -1,10 +1,12 @@
 import Groq from "groq-sdk";
 
-const GROQ_API_KEYS = [
-    "MA_CLE_1",
-    "MA_CLE_2",
-    "MA_CLE_3"
-];
+const groqKeysString = import.meta.env.VITE_GROQ_KEYS || "";
+const GROQ_API_KEYS = groqKeysString.split(",").filter(key => key.trim() !== "");
+
+// Fallback si aucune clé n'est configurée
+if (GROQ_API_KEYS.length === 0) {
+    GROQ_API_KEYS.push("MA_CLE_PAR_DEFAUT");
+}
 
 let currentKeyIndex = 0;
 
