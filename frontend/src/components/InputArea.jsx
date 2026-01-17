@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Send, Image as ImageIcon, Mic, MicOff, Volume2 } from "lucide-react";
 
-const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, onUserSpeaking }) => {
+const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, isAISpeaking, onUserSpeaking }) => {
     const [input, setInput] = useState("");
     const [isListening, setIsListening] = useState(false);
     const textareaRef = useRef(null);
@@ -51,7 +51,6 @@ const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, onUserSpe
                         if (currentText.trim() && isVoiceMode) {
                             onSendMessage(currentText);
                             setInput("");
-                            // On ne stop pas forcément le micro ici pour garder la fluidité
                         }
                     }, 1500); // 1.5 seconde de silence avant envoi auto
                 }
@@ -59,12 +58,23 @@ const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, onUserSpe
         }
     }, [isVoiceMode, onSendMessage, onUserSpeaking]);
 
+    // Gérer le démarrage et l'arrêt du micro
     useEffect(() => {
+        // Si l'IA parle, on coupe ABSOLUMENT le micro pour éviter le feedback
+        if (isAISpeaking) {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop();
+                setIsListening(false);
+            }
+            return;
+        }
+
+        // Si on est en mode vocal et que l'IA ne parle pas, on lance l'écoute
         if (isVoiceMode && recognitionRef.current) {
             try {
                 recognitionRef.current.start();
             } catch (e) {
-                console.error("Erreur démarrage reconnaissance:", e);
+                // Ignorer si déjà démarré
             }
         } else if (recognitionRef.current) {
             recognitionRef.current.stop();
@@ -75,7 +85,7 @@ const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, onUserSpe
             if (recognitionRef.current) recognitionRef.current.stop();
             clearTimeout(silenceTimerRef.current);
         };
-    }, [isVoiceMode]);
+    }, [isVoiceMode, isAISpeaking]); // Réagir aux deux états
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -143,7 +153,9 @@ const InputArea = ({ onSendMessage, mode, isVoiceMode, setIsVoiceMode, onUserSpe
                         <div className="w-1.5 h-1.5 bg-[var(--accent-blue)] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                         <div className="w-1.5 h-1.5 bg-[var(--accent-blue)] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                         <div className="w-1.5 h-1.5 bg-[var(--accent-blue)] rounded-full animate-bounce"></div>
-                        <span className="text-[10px] font-bold text-[var(--accent-blue)] ml-2 uppercase tracking-widest">Mode Vocal Actif</span>
+                        <span className="text-[10px] font-bold text-[var(--accent-blue)] ml-2 uppercase tracking-widest">
+                            {isAISpeaking ? "L'IA parle..." : "Mode Vocal Actif"}
+                        </span>
                     </div>
                 </div>
             )}

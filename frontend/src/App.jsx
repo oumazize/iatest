@@ -22,8 +22,8 @@ function App() {
   const [error, setError] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [isVoiceMode, setIsVoiceMode] = useState(false);
+  const [isAISpeaking, setIsAISpeaking] = useState(false); // État pour savoir si l'IA parle
   const messagesEndRef = useRef(null);
-  const speechRef = useRef(null);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -60,6 +60,7 @@ function App() {
   const stopSpeaking = () => {
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
+      setIsAISpeaking(false);
     }
   };
 
@@ -77,6 +78,11 @@ function App() {
 
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
+
+    utterance.onstart = () => setIsAISpeaking(true);
+    utterance.onend = () => setIsAISpeaking(false);
+    utterance.onerror = () => setIsAISpeaking(false);
+
     window.speechSynthesis.speak(utterance);
   };
 
@@ -191,6 +197,7 @@ function App() {
             mode={mode}
             isVoiceMode={isVoiceMode}
             setIsVoiceMode={setIsVoiceMode}
+            isAISpeaking={isAISpeaking}
             onUserSpeaking={() => stopSpeaking()} // Interrompre l'IA quand l'utilisateur parle
           />
           <p className="text-center text-[10px] text-[var(--text-secondary)] mt-4 uppercase tracking-[0.25em] font-bold opacity-30">
